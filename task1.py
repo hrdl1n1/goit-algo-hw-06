@@ -30,10 +30,12 @@ class Record:
 
     def remove_phone(self, phone):
         # Видаляємо вказаний телефонний номер із запису
-        self.phones = [p for p in self.phones if str(p) != phone]
+        self.phones = [p for p in self.phones if p.value != phone]
 
     def edit_phone(self, old_phone, new_phone):
-        # Редагуємо телефонний номер у записі, замінюючи старий на новий
+        # Перевіряємо, чи існує старий номер телефону для редагування
+        if not self.find_phone(old_phone):
+            raise ValueError("Phone number to edit does not exist")
         self.remove_phone(old_phone)
         self.add_phone(new_phone)
 
@@ -41,13 +43,13 @@ class Record:
         # Шукаємо телефонний номер у записі та повертаємо його об'єкт,
         # якщо знайдено, або None, якщо номер відсутній
         for p in self.phones:
-            if str(p) == phone:
+            if p.value == phone:
                 return p
         return None
 
     def __str__(self):
         # Повертаємо рядок, який представляє дані запису
-        return f"Contact name: {self.name.value}, phones: {'; '.join(str(p) for p in self.phones)}"
+        return f"Contact name: {str(self.name)}, phones: {'; '.join(str(p) for p in self.phones)}"
 
 class AddressBook(UserDict):
     def add_record(self, record):
@@ -56,7 +58,6 @@ class AddressBook(UserDict):
 
     def find(self, name):
         # Знаходимо запис у книзі за іменем та повертаємо його,
-        # якщо такий запис існує, або None, якщо запис відсутній
         return self.data.get(name)
 
     def delete(self, name):
